@@ -24,6 +24,12 @@ public class updateprofile {
 			// System.setProperty("webdriver.chrome.driver", "driver/chromedriver.exe");
 //			EdgeOptions options2 = new EdgeOptions();
 			ChromeOptions options = new ChromeOptions();
+
+			String chromeBinaryPath = System.getenv("CHROME_BINARY_PATH");
+			if (chromeBinaryPath != null) {
+			    options.setBinary(chromeBinaryPath);
+			}
+			
 			options.addArguments("--no-sandbox");
 			options.addArguments("--ignore-ssl-errors=yes");
 			options.addArguments("--ignore-certificate-errors");
