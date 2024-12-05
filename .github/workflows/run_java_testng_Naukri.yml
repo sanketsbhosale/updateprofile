@@ -11,7 +11,7 @@ on:
     - cron: '0 19 * * *'  # Runs daily at 12:00 PM UTC
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,13 +25,7 @@ jobs:
       uses: actions/setup-java@v3
       with:
         java-version: '21'        # Specify your desired Java version
-        distribution: 'temurin'   # Use OpenJDK distribution
-
-    - name: Set Up Maven
-      run: sudo apt-get install -y maven
-
-    - name: Install Dependencies
-      run: mvn clean install            # Installs dependencies from pom.xml
+        distribution: 'temurin'   # Use OpenJDK distribution 
 
     - name: Run TestNG Tests
-      run: mvn test               # Executes tests defined in testng.xml
+      run: mvn -B clean test              # Executes tests defined in testng.xml
