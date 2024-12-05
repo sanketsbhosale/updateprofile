@@ -18,6 +18,9 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v3  # Pulls the code from your GitHub repository
 
+    - uses: browser-actions/setup-chrome@latest
+    - run: chrome --version
+
     - name: Set Up JDK
       uses: actions/setup-java@v3
       with:
