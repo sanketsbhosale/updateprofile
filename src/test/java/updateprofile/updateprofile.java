@@ -21,14 +21,14 @@ public class updateprofile {
 	@Test
 	public void updateNaukriTest() throws Exception {
 		try {
-
+			System.setProperty("webdriver.chrome.driver", "driver/chromedriver.exe");
 //			EdgeOptions options2 = new EdgeOptions();
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--no-sandbox");
 			options.addArguments("--ignore-ssl-errors=yes");
 			options.addArguments("--ignore-certificate-errors");
 			options.addArguments("--disable-dev-shm-usage");
-			options.addArguments("--headless=new"); 
+			// options.addArguments("--headless=new"); 
  
 			driver = new ChromeDriver(options);
 //			driver = new EdgeDriver(options);
