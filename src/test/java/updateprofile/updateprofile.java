@@ -28,7 +28,7 @@ public class updateprofile {
 			options.addArguments("--ignore-ssl-errors=yes");
 			options.addArguments("--ignore-certificate-errors");
 			options.addArguments("--disable-dev-shm-usage");
-//			options.addArguments("--headless=new"); 
+			options.addArguments("--headless=new"); 
  
 			driver = new ChromeDriver(options);
 //			driver = new EdgeDriver(options);
