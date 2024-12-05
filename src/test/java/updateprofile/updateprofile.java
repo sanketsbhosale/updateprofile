@@ -25,6 +25,8 @@ public class updateprofile {
 //			EdgeOptions options2 = new EdgeOptions();
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--no-sandbox");
+			options.addArguments("--ignore-ssl-errors=yes");
+			options.addArguments("--ignore-certificate-errors");
 			options.addArguments("--disable-dev-shm-usage");
 //			options.addArguments("--headless=new"); 
  
