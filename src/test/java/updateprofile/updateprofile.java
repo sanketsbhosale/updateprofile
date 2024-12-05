@@ -21,7 +21,7 @@ public class updateprofile {
 	@Test
 	public void updateNaukriTest() throws Exception {
 		try {
-			System.setProperty("webdriver.chrome.driver", "driver/chromedriver.exe");
+			// System.setProperty("webdriver.chrome.driver", "driver/chromedriver.exe");
 //			EdgeOptions options2 = new EdgeOptions();
 			ChromeOptions options = new ChromeOptions();
 			options.addArguments("--no-sandbox");
