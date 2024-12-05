@@ -21,6 +21,9 @@ jobs:
     - uses: browser-actions/setup-chrome@latest
     - run: chrome --version
 
+    - name: Set up ChromeDriver
+      uses: actions/setup-chromedriver@v2
+
     - name: Set Up JDK
       uses: actions/setup-java@v3
       with:
