@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
+  <reporter-output>
+  </reporter-output>
+  <suite started-at="2024-12-05T04:24:17 IST" name="Default suite" finished-at="2024-12-05T04:24:45 IST" duration-ms="27672">
+    <groups>
+    </groups>
+    <test started-at="2024-12-05T04:24:17 IST" name="Default test" finished-at="2024-12-05T04:24:45 IST" duration-ms="27672">
+      <class name="updateprofile.updateprofile">
+        <test-method signature="updateNaukriTest()[pri:0, instance:updateprofile.updateprofile@1623b78d]" started-at="2024-12-05T04:24:18 IST" name="updateNaukriTest" finished-at="2024-12-05T04:24:45 IST" duration-ms="27586" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- updateNaukriTest -->
+      </class> <!-- updateprofile.updateprofile -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>
