@@ -4,15 +4,13 @@ import java.time.Duration;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.edge.EdgeOptions;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.Test;
+import org.testng.annotations.Test; 
 
 public class updateprofile {
 
@@ -24,10 +22,14 @@ public class updateprofile {
 	public void updateNaukriTest() throws Exception {
 		try {
 
-//			EdgeOptions options = new EdgeOptions();
+//			EdgeOptions options2 = new EdgeOptions();
+			ChromeOptions options = new ChromeOptions();
+			options.addArguments("--no-sandbox");
+			options.addArguments("--disable-dev-shm-usage");
 //			options.addArguments("--headless=new"); 
-
-			driver = new EdgeDriver();
+ 
+			driver = new ChromeDriver(options);
+//			driver = new EdgeDriver(options);
 			driver.get("https://www.naukri.com/");
 			driver.manage().window().maximize();
 			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
