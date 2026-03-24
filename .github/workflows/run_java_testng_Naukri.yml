@@ -8,7 +8,8 @@ on:
     branches:
       - master 
   schedule:
-    - cron: '0 09-19 * * *' 
+    - cron: '30 8-18 * * *'
+    - cron: '0 9-19 * * *' 
 
 jobs:
   build:
@@ -31,4 +32,4 @@ jobs:
         distribution: 'temurin'   # Use OpenJDK distribution 
 
     - name: Run TestNG Tests
-      run: mvn -B clean test              # Executes tests defined in testng.xml
+      run: mvn -B clean compile install test              # Executes tests defined in testng.xml
