@@ -8,8 +8,7 @@ on:
     branches:
       - master 
   schedule:
-    - cron: '30 8-18 * * *'
-    - cron: '0 9-19 * * *' 
+    - cron: '0,30 8-19 * * *'  # Runs every 30 minutes from 8:00 AM to 7:00 PM 
 
 jobs:
   build:
