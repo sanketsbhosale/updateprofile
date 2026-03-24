@@ -83,7 +83,7 @@ public class UpdateProfileTest {
 			saveButton.click();
 			logger.info("Clicked save button");
 
-            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='lightbox profileEditDrawer profileUpdatedProLayer model_open flipOpen']//div[@class='crossLayer']")))
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//span[@class='success-text' and text()='Profile updated successfully']/ancestor::div[contains(@class,'profileUpdatedProLayer')]//div[@class='crossLayer']")))
                     .click();
 
 			// Logout
