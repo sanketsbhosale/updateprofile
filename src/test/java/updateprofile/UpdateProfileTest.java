@@ -62,7 +62,7 @@ public class UpdateProfileTest {
         try {
             // Login
             logger.info("Starting Naukri profile update test");
-            wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@id='login_Layer']")))
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='login_Layer']")))
                     .click();
 
             // Enter credentials
