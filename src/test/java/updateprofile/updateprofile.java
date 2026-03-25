@@ -2,6 +2,7 @@ package updateprofile;
 
 import java.time.Duration;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -16,19 +17,13 @@ public class updateprofile {
 
 	public WebDriver driver;
 	private String email = "sanketsbhosale2016@gmail.com";
-	private String pass = "Sankeypy@789";
+	private String pass = "Sankeypy@532";
 
 	@Test
 	public void updateNaukriTest() throws Exception {
 		try {
-			// System.setProperty("webdriver.chrome.driver", "driver/chromedriver.exe");
-//			EdgeOptions options2 = new EdgeOptions();
+			WebDriverManager.chromedriver().setup();
 			ChromeOptions options = new ChromeOptions();
-
-			String chromeBinaryPath = System.getenv("CHROME_BINARY_PATH");
-			if (chromeBinaryPath != null) {
-			    options.setBinary(chromeBinaryPath);
-			}
 
 			options.addArguments("--disable-blink-features=AutomationControlled");
 			options.addArguments("start-maximized");
@@ -41,53 +36,50 @@ public class updateprofile {
 //			options.addArguments("--headless=new");
  
 			driver = new ChromeDriver(options);
-//			driver = new EdgeDriver(options);
 			driver.get("https://www.naukri.com/");
 			driver.manage().window().maximize();
-			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-			Thread.sleep(2000);
+			driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
 
-			driver.findElement(By.xpath("//a[@id='login_Layer']")).click();// input[@class='err-border']
+			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='login_Layer']"))).click();
 
 			// credentials
-			driver.findElement(By.xpath("//input[@placeholder='Enter your active Email ID / Username']"))
-					.sendKeys(email);
+			wait.until(ExpectedConditions.visibilityOfElementLocated(
+					By.xpath("//input[@placeholder='Enter your active Email ID / Username']"))).sendKeys(email);
 			driver.findElement(By.xpath("//input[@type='password']")).sendKeys(pass);
 
 			// login
 			driver.findElement(By.xpath("//button[@type='submit']")).click();
-			Thread.sleep(2000);
 
-			WebElement ViewProfile = driver
-					.findElement(By.xpath("//a[contains(text(),'View') and @href='/mnjuser/profile']"));
+			WebElement ViewProfile = wait.until(ExpectedConditions
+					.elementToBeClickable(By.xpath("//a[contains(text(),'View') and @href='/mnjuser/profile']")));
 			ViewProfile.click();
-			Thread.sleep(2000);
 
-			WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
-			WebElement EditProfile = driver.findElement(By.xpath("//em[contains(text(),'editOneTheme')]"));
-			wait.until(ExpectedConditions.elementToBeClickable(EditProfile));
+			WebElement EditProfile = wait.until(
+					ExpectedConditions.elementToBeClickable(By.xpath("//em[contains(text(),'editOneTheme')]")));
 			EditProfile.click();
-			Thread.sleep(2000);
 
-//			WebElement targetDiv = driver.findElement(By.xpath("//div[@class='col s12 action']"));
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("window.scrollBy(0,1000)");
 
-			WebElement targetDiv = driver.findElement(By.xpath("//button[@id='saveBasicDetailsBtn']"));
-			wait.until(ExpectedConditions.elementToBeClickable(EditProfile));
+			WebElement targetDiv = wait.until(
+					ExpectedConditions.elementToBeClickable(By.xpath("//button[@id='saveBasicDetailsBtn']")));
 			targetDiv.click();
-			Thread.sleep(2000);
-			
-			driver.findElement(By.xpath("//div[@class='nI-gNb-drawer__icon']")).click();
-			driver.findElement(By.xpath("//a[@title='Logout']")).click();
-			
-			Thread.sleep(2000);
-			driver.close();
-			driver.quit();
+
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath(
+					"//span[@class='success-text' and text()='Profile updated successfully']/ancestor::div[contains(@class,'profileUpdatedProLayer')]//div[@class='crossLayer']")))
+					.click();
+
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//div[@class='nI-gNb-drawer']"))).click();
+			wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@title='Logout']"))).click();
 
 		} catch (Exception e) {
-			e.printStackTrace();//
+			throw e;
+		} finally {
+			if (driver != null) {
+				driver.quit();
+			}
 		}
 	}
 }
