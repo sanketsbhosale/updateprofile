@@ -29,6 +29,10 @@ public class updateprofile {
 			if (chromeBinaryPath != null) {
 			    options.setBinary(chromeBinaryPath);
 			}
+
+			options.addArguments("--disable-blink-features=AutomationControlled");
+			options.addArguments("start-maximized");
+			options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
 			
 //			options.addArguments("--no-sandbox");
 //			options.addArguments("--ignore-ssl-errors=yes");
