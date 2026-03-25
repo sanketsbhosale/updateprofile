@@ -38,11 +38,14 @@ public class UpdateProfileTest {
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
-//            options.addArguments("--headless=new");
-            options.addArguments("--no-sandbox");
-            options.addArguments("--disable-dev-shm-usage"); 
 
-            driver = new ChromeDriver(options);
+            options.addArguments("--headless=new");   // ⭐ REQUIRED
+            options.addArguments("--no-sandbox");
+            options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--window-size=1920,1080");
+            options.addArguments("--remote-allow-origins=*");
+            
+            WebDriver driver = new ChromeDriver(options);
             driver.get("https://www.naukri.com/");
             driver.manage().window().maximize();
             driver.manage().timeouts().implicitlyWait(TIMEOUT);
