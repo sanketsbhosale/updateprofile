@@ -1,17 +1,17 @@
 package updateprofile;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.io.File;
 import java.time.Duration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,7 +31,19 @@ public class UpdateProfileTest {
 			// Automatically download and setup the correct ChromeDriver version
 			WebDriverManager.chromedriver().setup();
 
-			driver = new ChromeDriver();
+			ChromeOptions options = new ChromeOptions();
+
+//			options.addArguments("--headless=new");   // ⭐ REQUIRED
+//			options.addArguments("--no-sandbox");
+//			options.addArguments("--disable-dev-shm-usage");
+//			options.addArguments("--window-size=1920,1080");
+//			options.addArguments("--remote-allow-origins=*");
+
+			options.addArguments("--disable-blink-features=AutomationControlled");
+			options.addArguments("start-maximized");
+			options.addArguments("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64)");
+
+			driver = new ChromeDriver(options);
 			driver.get("https://www.naukri.com/");
 			driver.manage().window().maximize();
 			driver.manage().timeouts().implicitlyWait(TIMEOUT);
@@ -47,9 +59,27 @@ public class UpdateProfileTest {
 	public void updateNaukriTest() {
 		try {
 			// Login
-			logger.info("Starting Naukri profile update test");
-			wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@id='login_Layer']")))
-					.click();
+			try {
+				logger.info("Starting Naukri profile update test");
+				wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//a[@id='login_Layer']")))
+						.click();
+			} catch (Exception e) {
+
+				File screenshot = ((TakesScreenshot) driver)
+						.getScreenshotAs(OutputType.FILE);
+
+				String filepath = System.getProperty("user.dir") + "/screenshots/ci_debug.png";
+
+				FileUtils.copyFile(screenshot, new File(filepath));
+				System.out.println(filepath);
+				System.out.println("-------------------------------------------------");
+
+				System.out.println("Page source - " +
+						driver.getPageSource()); // VERY IMPORTANT
+				System.out.println("-------------------------------------------------");
+
+				throw e;
+			}
 
 			// Enter credentials
 			wait.until(ExpectedConditions.presenceOfElementLocated(
