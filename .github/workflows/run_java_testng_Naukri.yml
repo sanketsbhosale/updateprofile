@@ -3,32 +3,34 @@ name: Run TestNG Tests
 on:
   push:
     branches:
-      - master    # Runs the workflow when code is pushed to the main branch
-  pull_request:  # Runs the workflow for pull requests
+      - master
+  pull_request:
     branches:
-      - master 
+      - master
   schedule:
-    - cron: '0,30 8-19 * * *'  # Runs every 30 minutes from 8:00 AM to 7:00 PM 
+    - cron: '*/30 * * * *'   # run every 30 min
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Check IST Time Window
+      run: |
+        HOUR=$(TZ="Asia/Kolkata" date +%H)
+        if [ $HOUR -lt 9 ] || [ $HOUR -ge 19 ]; then
+          echo "Skipping execution outside 9AM–7PM IST"
+          exit 0
+        fi
+
     - name: Checkout Repository
-      uses: actions/checkout@v3  # Pulls the code from your GitHub repository
-
-    - uses: browser-actions/setup-chrome@latest
-    - run: chrome --version
-
-    - name: setup-chromedriver
-      uses: nanasess/setup-chromedriver@v2.3.0
+      uses: actions/checkout@v3
 
     - name: Set Up JDK
       uses: actions/setup-java@v3
       with:
-        java-version: '21'        # Specify your desired Java version
-        distribution: 'temurin'   # Use OpenJDK distribution 
+        java-version: '21'
+        distribution: 'temurin'
 
     - name: Run TestNG Tests
-      run: mvn -B clean compile install test              # Executes tests defined in testng.xml
+      run: mvn -B clean test
