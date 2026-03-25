@@ -65,9 +65,6 @@ public class UpdateProfileTest {
             wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='login_Layer']")))
                     .click();
 
-            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-FileUtils.copyFile(screenshot, new File("ci_debug.png"));
-
             // Enter credentials
             wait.until(ExpectedConditions.presenceOfElementLocated(
                             By.xpath("//input[@placeholder='Enter your active Email ID / Username']")))
