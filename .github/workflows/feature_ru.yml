@@ -44,5 +44,5 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: screenshot
-          path: screenshot/ci_debug.png
+          name: selenium-debug
+          path: screenshots
