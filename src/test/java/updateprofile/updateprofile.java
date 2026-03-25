@@ -30,11 +30,11 @@ public class updateprofile {
 			    options.setBinary(chromeBinaryPath);
 			}
 			
-			options.addArguments("--no-sandbox");
-			options.addArguments("--ignore-ssl-errors=yes");
-			options.addArguments("--ignore-certificate-errors");
-			options.addArguments("--disable-dev-shm-usage");
-			options.addArguments("--headless=new"); 
+//			options.addArguments("--no-sandbox");
+//			options.addArguments("--ignore-ssl-errors=yes");
+//			options.addArguments("--ignore-certificate-errors");
+//			options.addArguments("--disable-dev-shm-usage");
+//			options.addArguments("--headless=new");
  
 			driver = new ChromeDriver(options);
 //			driver = new EdgeDriver(options);
