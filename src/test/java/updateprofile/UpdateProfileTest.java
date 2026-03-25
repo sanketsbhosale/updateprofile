@@ -66,7 +66,7 @@ public class UpdateProfileTest {
     }
 
     @Test
-    public void updateNaukriTest() {
+    public void updateNaukriTest() throws IOException {
         try {
             // Login
             logger.info("Starting Naukri profile update test");
