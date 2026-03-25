@@ -29,11 +29,16 @@ public class UpdateProfileTest {
     @BeforeMethod
     public void setUp() {
         try {
+            // Validate environment variables
+            if (EMAIL == null || EMAIL.isEmpty() || PASSWORD == null || PASSWORD.isEmpty()) {
+                throw new RuntimeException("NAUKRI_EMAIL and NAUKRI_PASSWORD environment variables must be set");
+            }
+            
             // Automatically download and setup the correct ChromeDriver version
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless=new");
+//            options.addArguments("--headless=new");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage"); 
 

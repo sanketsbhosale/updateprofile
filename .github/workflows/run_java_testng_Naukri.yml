@@ -34,3 +34,6 @@ jobs:
 
     - name: Run TestNG Tests
       run: mvn -B clean test
+      env:
+        NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
+        NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
