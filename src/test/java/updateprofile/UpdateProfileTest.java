@@ -117,7 +117,7 @@ public class UpdateProfileTest {
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error occurred during test execution", e);
             File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            FileUtils.copyFile(screenshot, new File("ci_debug.png"));
+            FileUtils.copyFile(screenshot, new File("screenshots/ci_debug.png"));
             throw new RuntimeException("Test execution failed", e);
         }
     }
