@@ -8,39 +8,32 @@ on:
     branches:
       - master
   schedule:
-    - cron: '*/30 * * * *'   # run every 30 min
+    - cron: '*/30 * * * *'
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
+
     - name: Check IST Time Window
+      shell: pwsh
       run: |
-        HOUR=$(TZ="Asia/Kolkata" date +%H)
-        if [ $HOUR -lt 9 ] || [ $HOUR -ge 19 ]; then
-          echo "Skipping execution outside 9AM–7PM IST"
+        $hour = (Get-Date).ToUniversalTime().AddHours(5.5).Hour
+        if ($hour -lt 9 -or $hour -ge 19) {
+          Write-Host "Skipping execution outside 9AM–7PM IST"
           exit 0
-        fi
+        }
 
     - name: Checkout Repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set Up JDK
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Install Chrome dependencies
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y chromium-browser chromium-chromedriver
-        # Or for Google Chrome:
-        # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-        # sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
-        # sudo apt-get update && sudo apt-get install -y google-chrome-stable
-        
     - name: Run TestNG Tests
       run: mvn -B clean test
       env:
