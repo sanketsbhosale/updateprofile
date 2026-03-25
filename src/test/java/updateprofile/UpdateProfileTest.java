@@ -65,6 +65,9 @@ public class UpdateProfileTest {
             wait.until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@id='login_Layer']")))
                     .click();
 
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+FileUtils.copyFile(screenshot, new File("ci_debug.png"));
+
             // Enter credentials
             wait.until(ExpectedConditions.presenceOfElementLocated(
                             By.xpath("//input[@placeholder='Enter your active Email ID / Username']")))
@@ -108,6 +111,8 @@ public class UpdateProfileTest {
 
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error occurred during test execution", e);
+            File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            FileUtils.copyFile(screenshot, new File("ci_debug.png"));
             throw new RuntimeException("Test execution failed", e);
         }
     }
