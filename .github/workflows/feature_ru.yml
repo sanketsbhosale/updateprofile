@@ -28,14 +28,18 @@ jobs:
         id: time_window
         shell: bash
         run: |
+          EVENT_NAME="${{ github.event_name }}"
           IST_HOUR=$(TZ=Asia/Kolkata date +%H)
           IST_TIME=$(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M:%S')
-          if ((10#$IST_HOUR >= 9 && 10#$IST_HOUR < 19)); then
+          if [ "$EVENT_NAME" != "schedule" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "Event is $EVENT_NAME. Skipping time-window check and continuing."
+          elif ((10#$IST_HOUR >= 9 && 10#$IST_HOUR < 19)); then
             echo "should_run=true" >> "$GITHUB_OUTPUT"
             echo "Current IST time: $IST_TIME. Continuing workflow."
           else
             echo "should_run=false" >> "$GITHUB_OUTPUT"
-            echo "Current IST time: $IST_TIME. Skipping outside 9AM-7PM IST."
+            echo "Current IST time: $IST_TIME. Skipping scheduled run outside 9AM-7PM IST."
           fi
 
       - name: Checkout Repository
