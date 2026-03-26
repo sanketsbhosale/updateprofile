@@ -7,6 +7,13 @@ on:
   pull_request:
     branches:
       - feature
+  workflow_dispatch:
+    inputs:
+      run_live_test:
+        description: 'Run the live Naukri Selenium test'
+        required: false
+        default: false
+        type: boolean
   schedule:
     - cron: '*/30 * * * *'
 
@@ -39,6 +46,7 @@ jobs:
         env:
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
+          RUN_NAUKRI_LIVE_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_test || 'false' }}
 
       - name: Upload Screenshot
         if: failure()

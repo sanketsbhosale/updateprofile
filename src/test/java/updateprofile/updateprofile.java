@@ -18,11 +18,12 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.SkipException;
 import org.testng.annotations.Test; 
 
 public class updateprofile {
 
-	private static final Duration TIMEOUT = Duration.ofSeconds(20);
+	private static final Duration TIMEOUT = Duration.ofSeconds(30);
 	private static final By LOGIN_BUTTON = By.xpath("//a[@id='login_Layer']");
 	private static final By EMAIL_INPUT = By.xpath("//input[@placeholder='Enter your active Email ID / Username']");
 	private static final By PASSWORD_INPUT = By.xpath("//input[@type='password']");
@@ -31,8 +32,7 @@ public class updateprofile {
 	private static final By PROFILE_ICON_LINK = By.xpath("//a[contains(@href,'/mnjuser/profile')]");
 	private static final By PROFILE_EDIT_BUTTON = By.xpath("//em[contains(text(),'editOneTheme')]");
 	private static final By SAVE_BUTTON = By.xpath("//button[@id='saveBasicDetailsBtn']");
-	private static final By SUCCESS_POPUP_CLOSE = By.xpath(
-			"//span[@class='success-text' and text()='Profile updated successfully']/ancestor::div[contains(@class,'profileUpdatedProLayer')]//div[@class='crossLayer']");
+	private static final By SUCCESS_POPUP_CLOSE = By.xpath("//span[@class='success-text' and text()='Profile updated successfully']/ancestor::div[contains(@class,'profileUpdatedProLayer')]//div[@class='crossLayer']");
 	private static final By LOGOUT_MENU = By.xpath("//div[@class='nI-gNb-drawer']");
 	private static final By LOGOUT_ICON = By.xpath("//div[@class='nI-gNb-drawer__icon']");
 	private static final By LOGOUT_LINK = By.xpath("//a[@title='Logout']");
@@ -44,6 +44,9 @@ public class updateprofile {
 	@Test
 	public void updateNaukriTest() throws Exception {
 		WebDriverWait wait = null;
+		if (shouldSkipLiveTest()) {
+			throw new SkipException("Skipping live Naukri automation in GitHub Actions. OTP cannot be completed reliably in hosted CI.");
+		}
 		try {
 			WebDriverManager.chromedriver().setup();
 			ChromeOptions options = new ChromeOptions();
@@ -157,6 +160,10 @@ public class updateprofile {
 	private boolean isCiRun() {
 		return "true".equalsIgnoreCase(System.getenv("GITHUB_ACTIONS"))
 				|| "true".equalsIgnoreCase(System.getenv("CI"));
+	}
+
+	private boolean shouldSkipLiveTest() {
+		return isCiRun() && !"true".equalsIgnoreCase(System.getenv("RUN_NAUKRI_LIVE_TEST"));
 	}
 
 	private static String getCredential(String envKey, String fallback) {
