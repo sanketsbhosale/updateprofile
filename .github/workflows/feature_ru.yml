@@ -26,16 +26,17 @@ jobs:
     steps:
       - name: Check IST Time Window
         id: time_window
-        shell: pwsh
+        shell: bash
         run: |
-          $istNow = (Get-Date).ToUniversalTime().AddHours(5).AddMinutes(30)
-          if ($istNow.Hour -ge 9 -and $istNow.Hour -lt 19) {
-            "should_run=true" >> $env:GITHUB_OUTPUT
-            "Current IST time: $($istNow.ToString('yyyy-MM-dd HH:mm:ss')). Continuing workflow."
-          } else {
-            "should_run=false" >> $env:GITHUB_OUTPUT
-            "Current IST time: $($istNow.ToString('yyyy-MM-dd HH:mm:ss')). Skipping outside 9AM-7PM IST."
-          }
+          IST_HOUR=$(TZ=Asia/Kolkata date +%H)
+          IST_TIME=$(TZ=Asia/Kolkata date '+%Y-%m-%d %H:%M:%S')
+          if ((10#$IST_HOUR >= 9 && 10#$IST_HOUR < 19)); then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "Current IST time: $IST_TIME. Continuing workflow."
+          else
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "Current IST time: $IST_TIME. Skipping outside 9AM-7PM IST."
+          fi
 
       - name: Checkout Repository
         if: steps.time_window.outputs.should_run == 'true'
