@@ -41,7 +41,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Run TestNG Tests
-        run: mvn -B clean test
+        run: mvn -B clean compile install test
         env:
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
