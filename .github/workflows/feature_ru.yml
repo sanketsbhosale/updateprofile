@@ -52,4 +52,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: selenium-debug
-          path: screenshots
+          path: ci_debug.png
