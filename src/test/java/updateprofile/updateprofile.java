@@ -31,6 +31,7 @@ public class updateprofile {
 	private static final By VIEW_PROFILE_LINK = By.xpath("//a[contains(text(),'View') and contains(@href,'/mnjuser/profile')]");
 	private static final By PROFILE_ICON_LINK = By.xpath("//a[contains(@href,'/mnjuser/profile')]");
 	private static final By PROFILE_EDIT_BUTTON = By.xpath("//em[contains(text(),'editOneTheme')]");
+	private static final By NAME_TXTBOX = By.xpath("//input[@id='name']");
 	private static final By SAVE_BUTTON = By.xpath("//button[@id='saveBasicDetailsBtn']");
 	private static final By SUCCESS_POPUP_CLOSE = By.xpath("//span[@class='success-text' and text()='Profile updated successfully']/ancestor::div[contains(@class,'profileUpdatedProLayer')]//div[@class='crossLayer']");
 	private static final By LOGOUT_MENU = By.xpath("//div[@class='nI-gNb-drawer']");
@@ -83,6 +84,8 @@ public class updateprofile {
 			WebElement EditProfile = wait.until(
 					ExpectedConditions.elementToBeClickable(PROFILE_EDIT_BUTTON));
 			EditProfile.click();
+
+			wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_TXTBOX)).sendKeys("e");
 
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("window.scrollBy(0,1000)");
