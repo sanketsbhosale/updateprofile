@@ -12,18 +12,17 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: self-hosted   # ✅ CHANGED
 
     steps:
 
       - name: Check IST Time Window
-        shell: pwsh
         run: |
-          $hour = (Get-Date).ToUniversalTime().AddHours(5.5).Hour
-          if ($hour -lt 9 -or $hour -ge 19) {
-            Write-Host "Skipping execution outside 9AM–7PM IST"
+          HOUR=$(TZ="Asia/Kolkata" date +%H)
+          if [ $HOUR -lt 9 ] || [ $HOUR -ge 19 ]; then
+            echo "Skipping execution outside 9AM–7PM IST"
             exit 0
-          }
+          fi
 
       - name: Checkout Repository
         uses: actions/checkout@v4
