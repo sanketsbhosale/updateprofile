@@ -19,18 +19,50 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted   # ✅ CHANGED
+    runs-on: self-hosted
+    outputs:
+      should_run: ${{ steps.time_window.outputs.should_run }}
 
     steps:
-
       - name: Check IST Time Window
+        id: time_window
+        shell: pwsh
         run: |
-          HOUR=$(TZ="Asia/Kolkata" date +%H)
-          if [ $HOUR -lt 9 ] || [ $HOUR -ge 19 ]; then
-            echo "Skipping execution outside 9AM–7PM IST"
-            exit 0
-          fi
+          $istNow = (Get-Date).ToUniversalTime().AddHours(5).AddMinutes(30)
+          if ($istNow.Hour -ge 9 -and $istNow.Hour -lt 19) {
+            "should_run=true" >> $env:GITHUB_OUTPUT
+            "Current IST time: $($istNow.ToString('yyyy-MM-dd HH:mm:ss')). Continuing workflow."
+          } else {
+            "should_run=false" >> $env:GITHUB_OUTPUT
+            "Current IST time: $($istNow.ToString('yyyy-MM-dd HH:mm:ss')). Skipping outside 9AM-7PM IST."
+          }
 
+      - name: Checkout Repository
+        if: steps.time_window.outputs.should_run == 'true'
+        uses: actions/checkout@v4
+
+      - name: Set Up JDK
+        if: steps.time_window.outputs.should_run == 'true'
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build Project
+        if: steps.time_window.outputs.should_run == 'true'
+        run: mvn -B clean package -DskipTests
+
+      - name: Skip Build Outside IST Window
+        if: steps.time_window.outputs.should_run != 'true'
+        run: echo "Build skipped because the workflow ran outside the allowed IST window."
+
+  run-updateprofile-test:
+    needs: build
+    if: needs.build.outputs.should_run == 'true'
+    runs-on: self-hosted
+
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -39,17 +71,19 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven
 
-      - name: Run TestNG Tests
-        run: mvn -B clean test
+      - name: Run updateprofile TestNG Test
+        run: mvn -B test "-Dsurefire.suiteXmlFiles=testng.xml"
         env:
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
           RUN_NAUKRI_LIVE_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_test || 'false' }}
 
-      - name: Upload Screenshot
+      - name: Upload Debug Artifacts
         if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: selenium-debug
-          path: ci_debug.png
+          path: screenshots
+          if-no-files-found: ignore
