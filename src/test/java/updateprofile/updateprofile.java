@@ -85,7 +85,7 @@ public class updateprofile {
 					ExpectedConditions.elementToBeClickable(PROFILE_EDIT_BUTTON));
 			EditProfile.click();
 
-//			wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_TXTBOX)).sendKeys("e");
+			wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_TXTBOX)).sendKeys("e");
 
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("window.scrollBy(0,1000)");
