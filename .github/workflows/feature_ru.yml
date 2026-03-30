@@ -35,7 +35,7 @@ jobs:
           cache: maven
 
       - name: Build Project
-        run: mvn -B clean package -DskipTests
+        run: mvn -B clean compile install -DskipTests
 
   run-updateprofile-test:
     needs: build
