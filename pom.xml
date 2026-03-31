@@ -38,13 +38,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.13.0</version>
 				<configuration>
-<<<<<<< HEAD
-				    <source>11</source>
-				    <target>11</target>
-=======
-					<source>21</source>
-					<target>21</target>
->>>>>>> 12518e57f079b181528ef09ae1ae803159a8360b
+					<source>${maven.compiler.source}</source>
+					<target>${maven.compiler.target}</target>
 				</configuration>
 			</plugin>
 			<plugin>
