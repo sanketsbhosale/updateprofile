@@ -1,18 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.naukri</groupId>
-  <artifactId>updateprofile</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <dependencies>
-		<!--
-		https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java -->
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.naukri</groupId>
+	<artifactId>updateprofile</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<dependencies>
 		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>4.10.0</version>
-		</dependency>
+    <groupId>org.seleniumhq.selenium</groupId>
+    <artifactId>selenium-java</artifactId>
+    <version>4.10.0</version>
+</dependency>
 		<!-- https://mvnrepository.com/artifact/org.testng/testng -->
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -20,26 +18,33 @@
 			<version>7.7.1</version>
 			<scope>test</scope>
 		</dependency>
-	  <!-- Source: https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
-	  <dependency>
-		  <groupId>io.github.bonigarcia</groupId>
-		  <artifactId>webdrivermanager</artifactId>
-		  <version>6.1.0</version>
-		  <scope>compile</scope>
-	  </dependency>
+		<!-- Source: https://mvnrepository.com/artifact/io.github.bonigarcia/webdrivermanager -->
+		<dependency>
+			<groupId>io.github.bonigarcia</groupId>
+			<artifactId>webdrivermanager</artifactId>
+			<version>6.1.0</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 	<properties>
-    		<java.version>21</java.version>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.13.0</version>
 				<configuration>
+<<<<<<< HEAD
 				    <source>11</source>
 				    <target>11</target>
+=======
+					<source>21</source>
+					<target>21</target>
+>>>>>>> 12518e57f079b181528ef09ae1ae803159a8360b
 				</configuration>
 			</plugin>
 			<plugin>
