@@ -31,8 +31,8 @@ import java.util.logging.Logger;
 public class UpdateProfileTest {
 
     private static final Logger logger = Logger.getLogger(UpdateProfileTest.class.getName());
-    private static final String EMAIL = getConfig("NAUKRI_EMAIL");
-    private static final String PASSWORD = getConfig("NAUKRI_PASSWORD");
+    private static final String EMAIL = System.getenv("NAUKRI_EMAIL");
+    private static final String PASSWORD = System.getenv("NAUKRI_PASSWORD");
     private static final Duration TIMEOUT = Duration.ofSeconds(15);
     private static final Duration SAVE_TIMEOUT = Duration.ofSeconds(20);
     private static final String PROFILE_UPDATE_MARKER = ".";
@@ -281,25 +281,11 @@ public class UpdateProfileTest {
 
     private void validateTestPrerequisites() {
         if (isBlank(EMAIL) || isBlank(PASSWORD)) {
-            throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD as env vars or -D properties to run it.");
+            throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD to run it.");
         }
     }
 
-    private static String getConfig(String key) {
-        String envValue = System.getenv(key);
-        if (!isBlank(envValue)) {
-            return envValue;
-        }
-
-        String propertyValue = System.getProperty(key);
-        if (!isBlank(propertyValue)) {
-            return propertyValue;
-        }
-
-        return null;
-    }
-
-    private static boolean isBlank(String value) {
+    private boolean isBlank(String value) {
         return value == null || value.isBlank();
     }
 }
