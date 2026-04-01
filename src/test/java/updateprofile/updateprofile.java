@@ -39,8 +39,8 @@ public class updateprofile {
 	private static final By LOGOUT_LINK = By.xpath("//a[@title='Logout']");
 
 	public WebDriver driver;
-	private final String email = System.getenv("NAUKRI_EMAIL");
-	private final String pass = System.getenv("NAUKRI_PASSWORD");
+	private final String email = getConfig("NAUKRI_EMAIL");
+	private final String pass = getConfig("NAUKRI_PASSWORD");
 
 	@Test
 	public void updateNaukriTest() throws Exception {
@@ -83,7 +83,8 @@ public class updateprofile {
 					ExpectedConditions.elementToBeClickable(PROFILE_EDIT_BUTTON));
 			EditProfile.click();
 
-			wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_TXTBOX)).sendKeys("e");
+			WebElement nameTextBox = wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_TXTBOX));
+			nameTextBox.sendKeys("e");
 
 			JavascriptExecutor js = (JavascriptExecutor) driver;
 			js.executeScript("window.scrollBy(0,1000)");
@@ -167,7 +168,21 @@ public class updateprofile {
 
 	private void validateTestPrerequisites() {
 		if (email == null || email.isBlank() || pass == null || pass.isBlank()) {
-			throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD to run it.");
+			throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD as env vars or -D properties to run it.");
 		}
+	}
+
+	private static String getConfig(String key) {
+		String envValue = System.getenv(key);
+		if (envValue != null && !envValue.isBlank()) {
+			return envValue;
+		}
+
+		String propertyValue = System.getProperty(key);
+		if (propertyValue != null && !propertyValue.isBlank()) {
+			return propertyValue;
+		}
+
+		return null;
 	}
 }
