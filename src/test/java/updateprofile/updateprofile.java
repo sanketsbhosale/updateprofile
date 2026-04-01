@@ -39,16 +39,14 @@ public class updateprofile {
 	private static final By LOGOUT_LINK = By.xpath("//a[@title='Logout']");
 
 	public WebDriver driver;
-	private String email = getCredential("NAUKRI_EMAIL", "sanketsbhosale2016@gmail.com");
-	private String pass = getCredential("NAUKRI_PASSWORD", "Sankeypy@532");
+	private final String email = System.getenv("NAUKRI_EMAIL");
+	private final String pass = System.getenv("NAUKRI_PASSWORD");
 
 	@Test
 	public void updateNaukriTest() throws Exception {
 		WebDriverWait wait = null;
-		if (shouldSkipLiveTest()) {
-			throw new SkipException("Skipping live Naukri automation in GitHub Actions. OTP cannot be completed reliably in hosted CI.");
-		}
 		try {
+			validateTestPrerequisites();
 			WebDriverManager.chromedriver().setup();
 			ChromeOptions options = new ChromeOptions();
 
@@ -99,6 +97,8 @@ public class updateprofile {
 			clickFirstVisible(wait, LOGOUT_MENU, LOGOUT_ICON);
 			wait.until(ExpectedConditions.elementToBeClickable(LOGOUT_LINK)).click();
 
+		} catch (SkipException e) {
+			throw e;
 		} catch (Exception e) {
 			captureDebugArtifacts();
 			throw e;
@@ -165,12 +165,21 @@ public class updateprofile {
 				|| "true".equalsIgnoreCase(System.getenv("CI"));
 	}
 
-	private boolean shouldSkipLiveTest() {
-		return isCiRun() && !"true".equalsIgnoreCase(System.getenv("RUN_NAUKRI_LIVE_TEST"));
+	private boolean isLiveTestEnabled() {
+		return "true".equalsIgnoreCase(System.getenv("RUN_NAUKRI_LIVE_TEST"));
 	}
 
-	private static String getCredential(String envKey, String fallback) {
-		String value = System.getenv(envKey);
-		return value == null || value.isBlank() ? fallback : value;
+	private boolean shouldSkipLiveTest() {
+		return isCiRun() && !isLiveTestEnabled();
+	}
+
+	private void validateTestPrerequisites() {
+		if (shouldSkipLiveTest()) {
+			throw new SkipException("Skipping live Naukri automation in CI. Set RUN_NAUKRI_LIVE_TEST=true to enable it.");
+		}
+
+		if (email == null || email.isBlank() || pass == null || pass.isBlank()) {
+			throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD to run it.");
+		}
 	}
 }
