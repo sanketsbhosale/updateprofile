@@ -3,6 +3,7 @@ package updateprofile;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -22,6 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +35,7 @@ public class UpdateProfileTest {
     private static final String PASSWORD = System.getenv("NAUKRI_PASSWORD");
     private static final Duration TIMEOUT = Duration.ofSeconds(15);
     private static final Duration SAVE_TIMEOUT = Duration.ofSeconds(20);
+    private static final String PROFILE_UPDATE_MARKER = ".";
 
     private static final By LOGIN_BUTTON = By.id("login_Layer");
     private static final By EMAIL_INPUT = By.xpath("//input[@placeholder='Enter your active Email ID / Username']");
@@ -41,8 +44,7 @@ public class UpdateProfileTest {
     private static final By VIEW_PROFILE_LINK = By.xpath("//a[contains(text(),'View') and @href='/mnjuser/profile']");
     private static final By PROFILE_EDIT_BUTTON = By.xpath("//em[contains(text(),'editOneTheme')]");
     private static final By BASIC_DETAILS_MODAL = By.cssSelector(".lightbox.profileEditDrawer.model_open");
-    private static final By NOTICE_PERIOD_INPUT = By.id("hid_noticePeriod");
-    private static final By NOTICE_PERIOD_CHIPS = By.cssSelector(".notice-period-container .chip-item");
+    private static final By NAME_INPUT = By.id("name");
     private static final By SAVE_BUTTON = By.id("saveBasicDetailsBtn");
     private static final By BASIC_DETAILS_ERRORS = By.cssSelector("#editBasicDetailsForm .erLbl");
     private static final By SUCCESS_LAYER = By.cssSelector(".profileUpdatedProLayer");
@@ -89,10 +91,6 @@ public class UpdateProfileTest {
 
     @Test
     public void updateNaukriTest() {
-        String originalNoticePeriodId = null;
-        String temporaryNoticePeriodId = null;
-        boolean temporaryNoticePeriodSaved = false;
-
         try {
             logger.info("Starting Naukri profile update test");
             wait.until(ExpectedConditions.elementToBeClickable(LOGIN_BUTTON)).click();
@@ -108,25 +106,17 @@ public class UpdateProfileTest {
             viewProfile.click();
             logger.info("Navigated to profile page");
 
-            openBasicDetailsEditor();
-            originalNoticePeriodId = getSelectedNoticePeriodId();
-            temporaryNoticePeriodId = chooseAlternateNoticePeriodId(originalNoticePeriodId);
-            selectNoticePeriod(temporaryNoticePeriodId);
-            saveBasicDetails();
-            temporaryNoticePeriodSaved = true;
+            WebElement editProfile = wait.until(ExpectedConditions.elementToBeClickable(PROFILE_EDIT_BUTTON));
+            editProfile.click();
+            logger.info("Clicked edit profile button");
 
-            openBasicDetailsEditor();
-            selectNoticePeriod(originalNoticePeriodId);
+//            updateBasicDetailsName();
             saveBasicDetails();
-            temporaryNoticePeriodSaved = false;
             logout();
             logger.info("Test completed successfully - logged out");
         } catch (SkipException e) {
             throw e;
         } catch (Exception e) {
-            if (temporaryNoticePeriodSaved && originalNoticePeriodId != null) {
-                restoreOriginalNoticePeriod(originalNoticePeriodId);
-            }
             logger.log(Level.SEVERE, "Error occurred during test execution", e);
             captureDebugArtifacts();
             throw new RuntimeException("Test execution failed", e);
@@ -167,59 +157,46 @@ public class UpdateProfileTest {
                 || "true".equalsIgnoreCase(System.getenv("CI"));
     }
 
-    private void openBasicDetailsEditor() {
-        WebElement editProfile = wait.until(ExpectedConditions.elementToBeClickable(PROFILE_EDIT_BUTTON));
-        clickElement(editProfile);
+    private void updateBasicDetailsName() {
         wait.until(ExpectedConditions.visibilityOfElementLocated(BASIC_DETAILS_MODAL));
-        logger.info("Opened basic details editor");
+
+        WebElement nameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_INPUT));
+        String currentName = normalizeWhitespace(nameInput.getAttribute("value"));
+        String updatedName = buildUpdatedName(currentName);
+
+        clearAndType(nameInput, updatedName);
+        logger.info("Updated basic details name field to trigger a profile refresh");
     }
 
-    private String getSelectedNoticePeriodId() {
-        WebElement noticePeriodInput = wait.until(ExpectedConditions.visibilityOfElementLocated(NOTICE_PERIOD_INPUT));
-        String currentValue = noticePeriodInput.getAttribute("value");
-        if (isBlank(currentValue)) {
-            throw new IllegalStateException("Notice period value is blank in the basic details modal");
+    private String buildUpdatedName(String currentName) {
+        String sanitizedName = sanitizeName(currentName);
+
+        if (isBlank(sanitizedName)) {
+            throw new IllegalStateException("Basic details name field is empty or invalid after sanitization");
         }
-        return currentValue;
+
+        if (sanitizedName.endsWith(PROFILE_UPDATE_MARKER)) {
+            return sanitizeName(sanitizedName.substring(0, sanitizedName.length() - PROFILE_UPDATE_MARKER.length()));
+        }
+
+        return sanitizedName + PROFILE_UPDATE_MARKER;
     }
 
-    private String chooseAlternateNoticePeriodId(String currentId) {
-        List<WebElement> noticePeriodChips = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(NOTICE_PERIOD_CHIPS));
-        for (WebElement chip : noticePeriodChips) {
-            String chipId = chip.getAttribute("data-id");
-            if (chip.isDisplayed() && !isBlank(chipId) && !chipId.equals(currentId)) {
-                return chipId;
-            }
+    private String sanitizeName(String value) {
+        if (isBlank(value)) {
+            return "";
         }
-        throw new IllegalStateException("Could not find an alternate notice period option");
+
+        return value.replaceAll("[^\\p{L} .']", " ")
+                .replaceAll("\\s+", " ")
+                .trim();
     }
 
-    private void selectNoticePeriod(String noticePeriodId) {
-        for (WebElement chip : wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(NOTICE_PERIOD_CHIPS))) {
-            if (!chip.isDisplayed()) {
-                continue;
-            }
-
-            if (noticePeriodId.equals(chip.getAttribute("data-id"))) {
-                clickElement(chip);
-                wait.until(driver -> noticePeriodId.equals(driver.findElement(NOTICE_PERIOD_INPUT).getAttribute("value")));
-                logger.info("Selected notice period option with id " + noticePeriodId);
-                return;
-            }
-        }
-
-        throw new IllegalStateException("Notice period option not found for id " + noticePeriodId);
-    }
-
-    private void restoreOriginalNoticePeriod(String originalNoticePeriodId) {
-        try {
-            openBasicDetailsEditor();
-            selectNoticePeriod(originalNoticePeriodId);
-            saveBasicDetails();
-            logger.info("Restored original notice period after a failed run");
-        } catch (Exception restoreException) {
-            logger.log(Level.WARNING, "Failed to restore the original notice period", restoreException);
-        }
+    private void clearAndType(WebElement element, String value) {
+        element.click();
+        element.sendKeys(Keys.chord(Keys.CONTROL, "a"));
+        element.sendKeys(Keys.DELETE);
+        element.sendKeys(value);
     }
 
     private void saveBasicDetails() {
@@ -246,7 +223,7 @@ public class UpdateProfileTest {
     }
 
     private List<String> getVisibleValidationErrors() {
-        List<String> validationErrors = new java.util.ArrayList<>();
+        List<String> validationErrors = new ArrayList<>();
 
         for (WebElement errorElement : driver.findElements(BASIC_DETAILS_ERRORS)) {
             if (!errorElement.isDisplayed()) {
