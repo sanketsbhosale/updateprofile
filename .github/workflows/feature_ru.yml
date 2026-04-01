@@ -8,12 +8,6 @@ on:
     branches:
       - feature
   workflow_dispatch:
-    inputs:
-      run_live_test:
-        description: 'Run the live Naukri Selenium test'
-        required: false
-        default: false
-        type: boolean
   schedule:
     # 09:00-19:00 IST every 30 minutes, Monday-Friday
     - cron: '30 3 * * 1-5'
@@ -57,7 +51,6 @@ jobs:
         env:
           NAUKRI_EMAIL: ${{ secrets.NAUKRI_EMAIL }}
           NAUKRI_PASSWORD: ${{ secrets.NAUKRI_PASSWORD }}
-          RUN_NAUKRI_LIVE_TEST: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_test || 'false' }}
 
       - name: Upload Debug Artifacts
         if: failure()

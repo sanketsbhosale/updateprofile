@@ -279,15 +279,7 @@ public class UpdateProfileTest {
         return value.replaceAll("\\s+", " ").trim();
     }
 
-    private boolean isLiveTestEnabled() {
-        return "true".equalsIgnoreCase(System.getenv("RUN_NAUKRI_LIVE_TEST"));
-    }
-
     private void validateTestPrerequisites() {
-        if (isCiRun() && !isLiveTestEnabled()) {
-            throw new SkipException("Skipping live Naukri automation in CI. Set RUN_NAUKRI_LIVE_TEST=true to enable it.");
-        }
-
         if (isBlank(EMAIL) || isBlank(PASSWORD)) {
             throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD to run it.");
         }
