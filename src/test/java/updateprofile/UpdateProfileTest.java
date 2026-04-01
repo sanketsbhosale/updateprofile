@@ -162,7 +162,7 @@ public class UpdateProfileTest {
 
         WebElement nameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_INPUT));
         String currentName = normalizeWhitespace(nameInput.getAttribute("value"));
-        String updatedName = buildUpdatedName(currentName);
+        String updatedName = buildUpdatedName(currentName) + "test";
 
         clearAndType(nameInput, updatedName);
         logger.info("Updated basic details name field to trigger a profile refresh");
