@@ -9,9 +9,9 @@ on:
       - master
   workflow_dispatch:
   schedule:
-    # 09:00-19:00 IST every 30 minutes, Monday-Friday
-    - cron: '30 3 * * 1-5'
-    - cron: '0,30 4-13 * * 1-5'
+    # 09:00-18:20 IST every 20 minutes, Monday-Friday
+    - cron: '30,50 3 * * 1-5'
+    - cron: '10,30,50 4-12 * * 1-5'
 
 jobs:
   build:
