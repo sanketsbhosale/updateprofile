@@ -3,10 +3,10 @@ name: Feature Run
 on:
   push:
     branches:
-      - feature
+      - master
   pull_request:
     branches:
-      - feature
+      - master
   workflow_dispatch:
   schedule:
     # 09:00-19:00 IST every 30 minutes, Monday-Friday
