@@ -60,7 +60,7 @@ public class UpdateProfileTest {
         try {
             validateTestPrerequisites();
 
-            WebDriverManager.chromedriver().setup();
+            WebDriverManager.chromedriver().driverVersion("148.0.7778.178").setup();
 
             ChromeOptions options = new ChromeOptions();
             
