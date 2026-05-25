@@ -1,0 +1,59 @@
+# azure-pipelines.yml
+
+trigger:
+  branches:
+    include:
+      - feature
+
+pr:
+  branches:
+    include:
+      - feature
+
+schedules:
+  # 09:00 IST (03:30 UTC), Monday-Friday
+  - cron: '30 3 * * 1-5'
+    displayName: '09:00 IST Start'
+    branches:
+      include:
+        - feature
+    always: true
+
+  # 09:30-19:00 IST (04:00-13:30 UTC) every 30 mins, Monday-Friday
+  - cron: '0,30 4-13 * * 1-5'
+    displayName: '30-Min Intervals (09:30 - 19:00 IST)'
+    branches:
+      include:
+        - feature
+    always: true
+
+pool:
+  name: 'My-Azure-Runner' # This is the name we will give your runner later
+
+variables:
+- group: 'Selenium-Credentials' # This is the secret group we will build later
+
+jobs:
+- job: build
+  displayName: 'Build Project'
+  steps:
+  - script: mvn -B clean install -DskipTests
+    displayName: 'Build Project'
+
+- job: run_updateprofile_test
+  displayName: 'Run updateprofile TestNG Test'
+  dependsOn: build
+  steps:
+  - script: mvn -B test "-Dsurefire.suiteXmlFiles=testng.xml"
+    displayName: 'Run updateprofile TestNG Test'
+    env:
+      NAUKRI_EMAIL: $(NaukriEmailSecret)
+      NAUKRI_PASSWORD: $(NaukriPasswordSecret)
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Upload Debug Artifacts'
+    condition: failed()
+    inputs:
+      targetPath: 'screenshots'
+      artifact: 'selenium-debug'
+      publishLocation: 'pipeline'
