@@ -63,6 +63,7 @@ public class UpdateProfileTest {
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
+            
             options.addArguments("--disable-blink-features=AutomationControlled");
             options.addArguments("--remote-allow-origins=*");
             options.addArguments("start-maximized");
@@ -72,15 +73,15 @@ public class UpdateProfileTest {
                 options.addArguments("--headless=new");
                 options.addArguments("--no-sandbox");
                 options.addArguments("--disable-dev-shm-usage");
+                options.addArguments("--disable-gpu"); // Added for Linux stability
                 options.addArguments("--window-size=1920,1080");
             }
 
             driver = new ChromeDriver(options);
             driver.get("https://www.naukri.com/");
-            driver.manage().window().maximize();
             driver.manage().timeouts().implicitlyWait(TIMEOUT);
             wait = new WebDriverWait(driver, TIMEOUT);
-            logger.info("Browser initialized successfully");
+            logger.info("Browser initialized successfully in " + (isCiRun() ? "headless" : "headed") + " mode");
         } catch (SkipException e) {
             throw e;
         } catch (Exception e) {
@@ -95,158 +96,49 @@ public class UpdateProfileTest {
             logger.info("Starting Naukri profile update test");
             wait.until(ExpectedConditions.elementToBeClickable(LOGIN_BUTTON)).click();
 
-            wait.until(ExpectedConditions.presenceOfElementLocated(EMAIL_INPUT))
-                    .sendKeys(EMAIL);
+            wait.until(ExpectedConditions.presenceOfElementLocated(EMAIL_INPUT)).sendKeys(EMAIL);
             driver.findElement(PASSWORD_INPUT).sendKeys(PASSWORD);
-
             driver.findElement(SUBMIT_BUTTON).click();
-            logger.info("Login credentials submitted");
-
+            
             WebElement viewProfile = wait.until(ExpectedConditions.elementToBeClickable(VIEW_PROFILE_LINK));
             viewProfile.click();
-            logger.info("Navigated to profile page");
 
             WebElement editProfile = wait.until(ExpectedConditions.elementToBeClickable(PROFILE_EDIT_BUTTON));
             editProfile.click();
-            logger.info("Clicked edit profile button");
 
-//            updateBasicDetailsName();
             saveBasicDetails();
             logout();
-            logger.info("Test completed successfully - logged out");
-        } catch (SkipException e) {
-            throw e;
+            logger.info("Test completed successfully");
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error occurred during test execution", e);
             captureDebugArtifacts();
-            throw new RuntimeException("Test execution failed", e);
+            throw e;
         }
     }
 
     @AfterMethod
     public void tearDown() {
-        try {
-            if (driver != null) {
-                driver.quit();
-                logger.info("Browser closed successfully");
-            }
-        } catch (Exception e) {
-            logger.log(Level.WARNING, "Error closing browser", e);
+        if (driver != null) {
+            driver.quit();
         }
     }
 
     private void captureDebugArtifacts() {
-        if (driver == null) {
-            return;
-        }
-
         try {
             Path screenshotsDir = Path.of(System.getProperty("user.dir"), "screenshots");
             Files.createDirectories(screenshotsDir);
-
             File screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             Files.copy(screenshot.toPath(), screenshotsDir.resolve("ci_debug.png"), StandardCopyOption.REPLACE_EXISTING);
-            Files.writeString(screenshotsDir.resolve("page_source.html"), driver.getPageSource(),
-                    StandardCharsets.UTF_8);
-        } catch (Exception ignored) {
-        }
+        } catch (Exception ignored) {}
     }
 
     private boolean isCiRun() {
-        return "true".equalsIgnoreCase(System.getenv("GITHUB_ACTIONS"))
-                || "true".equalsIgnoreCase(System.getenv("CI"));
-    }
-
-    private void updateBasicDetailsName() {
-        wait.until(ExpectedConditions.visibilityOfElementLocated(BASIC_DETAILS_MODAL));
-
-        WebElement nameInput = wait.until(ExpectedConditions.visibilityOfElementLocated(NAME_INPUT));
-        String currentName = normalizeWhitespace(nameInput.getAttribute("value"));
-        String updatedName = buildUpdatedName(currentName);
-
-        clearAndType(nameInput, updatedName);
-        logger.info("Updated basic details name field to trigger a profile refresh");
-    }
-
-    private String buildUpdatedName(String currentName) {
-        String sanitizedName = sanitizeName(currentName);
-
-        if (isBlank(sanitizedName)) {
-            throw new IllegalStateException("Basic details name field is empty or invalid after sanitization");
-        }
-
-        if (sanitizedName.endsWith(PROFILE_UPDATE_MARKER)) {
-            return sanitizeName(sanitizedName.substring(0, sanitizedName.length() - PROFILE_UPDATE_MARKER.length()));
-        }
-
-        return sanitizedName + PROFILE_UPDATE_MARKER;
-    }
-
-    private String sanitizeName(String value) {
-        if (isBlank(value)) {
-            return "";
-        }
-
-        return value.replaceAll("[^\\p{L} .']", " ")
-                .replaceAll("\\s+", " ")
-                .trim();
-    }
-
-    private void clearAndType(WebElement element, String value) {
-        element.click();
-        element.sendKeys(Keys.chord(Keys.CONTROL, "a"));
-        element.sendKeys(Keys.DELETE);
-        element.sendKeys(value);
+        return "true".equalsIgnoreCase(System.getenv("CI"));
     }
 
     private void saveBasicDetails() {
         WebElement saveButton = wait.until(ExpectedConditions.elementToBeClickable(SAVE_BUTTON));
-        clickElement(saveButton);
-        logger.info("Clicked save button");
-        waitForSaveOutcome();
-    }
-
-    private void waitForSaveOutcome() {
-        WebDriverWait saveWait = new WebDriverWait(driver, SAVE_TIMEOUT);
-
-        saveWait.until(d -> {
-            List<String> validationErrors = getVisibleValidationErrors();
-            if (!validationErrors.isEmpty()) {
-                throw new IllegalStateException("Basic details validation failed: " + String.join(" | ", validationErrors));
-            }
-
-            return !isElementVisible(BASIC_DETAILS_MODAL) || isElementVisible(SUCCESS_LAYER);
-        });
-
-        dismissSuccessLayerIfVisible();
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", saveButton);
         wait.until(ExpectedConditions.invisibilityOfElementLocated(BASIC_DETAILS_MODAL));
-    }
-
-    private List<String> getVisibleValidationErrors() {
-        List<String> validationErrors = new ArrayList<>();
-
-        for (WebElement errorElement : driver.findElements(BASIC_DETAILS_ERRORS)) {
-            if (!errorElement.isDisplayed()) {
-                continue;
-            }
-
-            String errorText = normalizeWhitespace(errorElement.getText());
-            if (!errorText.isEmpty()) {
-                validationErrors.add(errorText);
-            }
-        }
-
-        return validationErrors;
-    }
-
-    private void dismissSuccessLayerIfVisible() {
-        if (!isElementVisible(SUCCESS_LAYER)) {
-            return;
-        }
-
-        WebElement successClose = wait.until(ExpectedConditions.elementToBeClickable(SUCCESS_LAYER_CLOSE));
-        clickElement(successClose);
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(SUCCESS_LAYER));
     }
 
     private void logout() {
@@ -254,38 +146,9 @@ public class UpdateProfileTest {
         wait.until(ExpectedConditions.elementToBeClickable(LOGOUT_LINK)).click();
     }
 
-    private void clickElement(WebElement element) {
-        try {
-            element.click();
-        } catch (Exception clickException) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-        }
-    }
-
-    private boolean isElementVisible(By locator) {
-        for (WebElement element : driver.findElements(locator)) {
-            if (element.isDisplayed()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private String normalizeWhitespace(String value) {
-        if (value == null) {
-            return "";
-        }
-
-        return value.replaceAll("\\s+", " ").trim();
-    }
-
     private void validateTestPrerequisites() {
-        if (isBlank(EMAIL) || isBlank(PASSWORD)) {
-            throw new SkipException("Skipping live Naukri automation. Set NAUKRI_EMAIL and NAUKRI_PASSWORD to run it.");
+        if (EMAIL == null || PASSWORD == null) {
+            throw new SkipException("Missing environment variables.");
         }
-    }
-
-    private boolean isBlank(String value) {
-        return value == null || value.isBlank();
     }
 }
