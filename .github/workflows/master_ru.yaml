@@ -32,6 +32,9 @@ pool:
 
 variables:
 - group: 'Selenium-Credentials' # This is the secret group we will build later
+  CI: 'true'
+  NAUKRI_EMAIL: $(NAUKRI_EMAIL)
+  NAUKRI_PASSWORD: $(NAUKRI_PASSWORD)
 
 jobs:
 - job: build
